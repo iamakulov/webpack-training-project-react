@@ -1,5 +1,5 @@
 /**
- * Copyright 2018 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc, 2018 Ivan Akulov. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,19 +11,16 @@
  * limitations under the License.
  */
 
-import createPlainComponent from '../../utils/createPlainComponent';
+import React from 'react';
 import logo from './logo.svg';
 import './style.css';
 
-const render = target => {
-  const renderUserHeader = createPlainComponent(`
-    <header>
-      <a class="user-header__link" href="/">
-        <img class="user-header__logo" src="${logo}" />
-      </a>
-    </header>
-  `);
-  renderUserHeader(target);
-};
+const UserHeader = () => (
+  <header>
+    <a className="user-header__link" href="/">
+      <img className="user-header__logo" src={logo} />
+    </a>
+  </header>
+);
 
-export default render;
+export default UserHeader;

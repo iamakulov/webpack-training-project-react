@@ -1,5 +1,5 @@
 /**
- * Copyright 2018 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc, 2018 Ivan Akulov. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,27 +12,37 @@
  */
 
 import moment from 'moment/moment';
-import createPlainComponent from '../../utils/createPlainComponent';
+import React from 'react';
 
-const render = target => {
-  // Create HTML
-  const renderHeader = createPlainComponent(
-    `<p>
-      LitHub is opening in <span class="home-header__time">∞</span> seconds!
-    </p>`,
-  );
-  const element = renderHeader(target);
-
-  // Init interactivity
-  const release = moment([2020, 3, 1]);
-  const updateDate = () => {
-    const time = release.diff(moment(), 'seconds', true);
-    element.querySelector('.home-header__time').textContent = time.toFixed(3);
-
-    // requestAnimationFrame would call updateDate() as soon as the frame changes
-    requestAnimationFrame(updateDate);
+class HomeHeader extends React.Component {
+  state = {
+    timeToRelease: '∞',
   };
-  updateDate();
-};
 
-export default render;
+  updateReleaseTime() {
+    const release = moment([2020, 3, 1]);
+    const time = release.diff(moment(), 'seconds', true);
+
+    this.setState({
+      timeToRelease: time.toFixed(3),
+    });
+
+    requestAnimationFrame(() => this.updateReleaseTime());
+  }
+
+  componentDidMount() {
+    this.updateReleaseTime();
+  }
+
+  render() {
+    return (
+      <p>
+        LitHub is opening in{' '}
+        <span className="home-header__time">{this.state.timeToRelease}</span>{' '}
+        seconds!
+      </p>
+    );
+  }
+}
+
+export default HomeHeader;

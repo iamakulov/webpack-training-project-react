@@ -1,5 +1,5 @@
 /**
- * Copyright 2018 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc, 2018 Ivan Akulov. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,37 +11,55 @@
  * limitations under the License.
  */
 
+import React from 'react';
 import { fetchFollowers } from '../../api';
-import createPlainComponent from '../../utils/createPlainComponent';
-import renderUserList from '../UserList';
+import UserList from '../UserList';
 
-const renderWarning = target => {
-  const render = createPlainComponent(
-    `<p>Showing at most the first 30 followers</p>`,
-  );
-  render(target);
-};
+class UserFollowers extends React.Component {
+  state = {
+    userFound: null,
+    users: null,
+  };
 
-const render = (target, { username }) => {
-  const renderLoadingPlaceholder = createPlainComponent(
-    '<div class="user-data__content">Loading...</div>',
-  );
-  const element = renderLoadingPlaceholder(target);
+  fetchData() {
+    this.setState({
+      users: null,
+    });
 
-  fetchFollowers(username).then(response => {
-    const userFound = response.status === 200;
-    const renderRealInfo = target => {
-      renderWarning(target);
-      renderUserList(target, { users: response.data.map(user => user.login) });
-    };
+    fetchFollowers(this.props.username).then(response => {
+      this.setState({
+        userFound: response.status === 200,
+        users: response.data.map(user => user.login),
+      });
+    });
+  }
 
-    const renderInfo = userFound
-      ? renderRealInfo
-      : createPlainComponent('No such user!');
+  componentDidMount() {
+    this.fetchData();
+  }
 
-    element.querySelector('.user-data__content').innerHTML = '';
-    renderInfo(element.querySelector('.user-data__content'));
-  });
-};
+  componentDidUpdate(prevProps) {
+    if (this.props.username !== prevProps.username) {
+      this.fetchData();
+    }
+  }
 
-export default render;
+  render() {
+    if (!this.state.users) {
+      return <div className="user-data__content">Loading...</div>;
+    }
+
+    if (!this.state.userFound) {
+      return 'No such user!';
+    }
+
+    return (
+      <>
+        <p>Showing at most the first 30 followers</p>
+        <UserList users={this.state.users} />
+      </>
+    );
+  }
+}
+
+export default UserFollowers;

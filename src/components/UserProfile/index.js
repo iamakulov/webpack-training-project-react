@@ -1,5 +1,5 @@
 /**
- * Copyright 2018 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc, 2018 Ivan Akulov. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,50 +11,79 @@
  * limitations under the License.
  */
 
+import React from 'react';
 import { fetchUser } from '../../api';
-import createPlainComponent from '../../utils/createPlainComponent';
 
-const render = (target, { username }) => {
-  const renderLoadingPlaceholder = createPlainComponent(
-    '<div class="user-data__content">Loading...</div>',
-  );
-  const element = renderLoadingPlaceholder(target);
+class UserProfile extends React.Component {
+  state = {
+    userFound: null,
+    user: null,
+  };
 
-  fetchUser(username).then(response => {
-    const userFound = response.status === 200;
-    const data = response.data;
+  fetchData() {
+    this.setState({
+      user: null,
+    });
 
-    const template = userFound
-      ? `<ul>
-          ${data.name ? `<li>Name: ${data.name}</li>` : ''}
-          <li>ID: ${data.id}</li>
-          ${
-            data.bio ? `<li>Bio: ${data.bio}</li>` : ''
-          }                                
-          ${
-            data.location ? `<li>Location: ${data.location}</li>` : ''
-          }                                
-          ${
-            data.email
-              ? `<li>Email: <a href="mailto:${data.email}">${
-                  data.email
-                }</a></li>`
-              : ''
-          }                                
-          ${
-            data.blog
-              ? `<li>Blog: <a href="${data.blog}">${data.blog}</a></li>`
-              : ''
-          }                                
-          <li>Full profile: <a href="https://github.com/${username}">https://github.com/${username}</a></li>
-        </ul>`
-      : 'No such user!';
+    fetchUser(this.props.username).then(response => {
+      this.setState({
+        userFound: response.status === 200,
+        user: response.data || {},
+      });
+    });
+  }
 
-    const renderInfo = createPlainComponent(template);
+  componentDidMount() {
+    this.fetchData();
+  }
 
-    element.querySelector('.user-data__content').innerHTML = '';
-    renderInfo(element.querySelector('.user-data__content'));
-  });
-};
+  componentDidUpdate(prevProps) {
+    if (this.props.username !== prevProps.username) {
+      this.fetchData();
+    }
+  }
 
-export default render;
+  render() {
+    const { username } = this.props;
+
+    if (!this.state.user) {
+      return <div className="user-data__content">Loading...</div>;
+    }
+
+    if (!this.state.userFound) {
+      return 'No such user!';
+    }
+
+    const user = this.state.user;
+
+    return (
+      <>
+        <ul>
+          {user.name && <li>Name: {user.name}</li>}
+          <li>ID: {user.id}</li>
+          {user.bio && <li>Bio: {user.bio}</li>}
+          {user.location && <li>Location: {user.location}</li>}
+          {user.email && (
+            <li>
+              Email: <a href={`mailto:${user.email}`}>{user.email}</a>
+            </li>
+          )}
+          {user.blog && (
+            <li>
+              Blog: <a href={user.blog}>{user.blog}</a>
+            </li>
+          )}
+          <li>
+            Full profile:{' '}
+            <a href={`https://github.com/${username}`}>
+              https://github.com/
+              {username}
+            </a>
+          </li>
+        </ul>
+      </>
+    );
+  }
+}
+
+export default UserProfile;

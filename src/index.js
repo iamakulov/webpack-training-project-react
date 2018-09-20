@@ -1,5 +1,5 @@
 /**
- * Copyright 2018 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc, 2018 Ivan Akulov. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,9 +18,11 @@
  */
 
 import 'babel-polyfill';
+import React from 'react';
+import ReactDOM from 'react-dom';
 
-import renderHome from './components/Home';
-import renderUser from './components/User';
+import Home from './components/Home';
+import User from './components/User';
 import initDevelopmentHelpers from './initDevelopmentHelpers';
 
 // This sets up things that help you during development.
@@ -31,11 +33,11 @@ const path = window.location.pathname;
 
 switch (path) {
   case '/':
-    renderHome(document.querySelector('#root'));
+    ReactDOM.render(<Home />, document.querySelector('#root'));
     break;
 
   case '/users/':
-    renderUser(document.querySelector('#root'));
+    ReactDOM.render(<User />, document.querySelector('#root'));
     break;
 
   default:

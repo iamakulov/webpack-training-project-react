@@ -1,5 +1,5 @@
 /**
- * Copyright 2018 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc, 2018 Ivan Akulov. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,99 +21,96 @@
  * Think of it as of a single-page app with multiple routes (hint-hint!).
  */
 
-import createHashRouter from 'hash-router';
-import createPlainComponent from '../../utils/createPlainComponent';
-import renderUserHeader from '../UserHeader';
-import renderUsernameInput from '../UsernameInput';
-import renderUserProfile from '../UserProfile';
-import renderUserFollowers from '../UserFollowers';
-import renderUserFollowing from '../UserFollowing';
+import React from 'react';
+import { HashRouter as Router, Route, NavLink } from 'react-router-dom';
+import UserHeader from '../UserHeader';
+import UsernameInput from '../UsernameInput';
+import UserProfile from '../UserProfile';
+import UserFollowers from '../UserFollowers';
+import UserFollowing from '../UserFollowing';
 import './style.css';
 
-const Route = {
-  USERNAME: 'USERNAME',
-  FOLLOWERS: 'FOLLOWERS',
-  FOLLOWING: 'FOLLOWING',
-};
+const Username = ({ username }) => (
+  <h2 className="user__user-title">User {username}</h2>
+);
 
-const renderUsername = (target, { username }) => {
-  const render = createPlainComponent(
-    `<h2 class="user__user-title">User ${username}</h2>`,
-  );
-  render(target);
-};
+const Navigation = ({ username }) => (
+  <nav>
+    <ul className="user__nav-list">
+      <li className="user__nav-item">
+        <NavLink
+          className="user__nav-route"
+          activeClassName="user__nav-route_active"
+          to={`/${username}`}
+          exact
+        >
+          Profile
+        </NavLink>
+      </li>
+      <li className="user__nav-item">
+        <NavLink
+          className="user__nav-route"
+          activeClassName="user__nav-route_active"
+          to={`/${username}/followers`}
+        >
+          Followers
+        </NavLink>
+      </li>
+      <li className="user__nav-item">
+        <NavLink
+          className="user__nav-route"
+          activeClassName="user__nav-route_active"
+          to={`/${username}/following`}
+        >
+          Following
+        </NavLink>
+      </li>
+    </ul>
+  </nav>
+);
 
-const renderNavigation = (target, { username, currentRoute }) => {
-  const render = createPlainComponent(`
-    <nav>
-      <ul class="user__nav-list">
-        <li class="user__nav-item">
-          ${
-            currentRoute === Route.USERNAME
-              ? `<span class="user__nav-route user__nav-route_active">Profile</span>`
-              : `<a class="user__nav-route" href="#/${username}">Profile</a>`
-          }
-        </li>
-        <li class="user__nav-item">
-          ${
-            currentRoute === Route.FOLLOWERS
-              ? `<span class="user__nav-route user__nav-route_active">Followers</span>`
-              : `<a class="user__nav-route" href="#/${username}/followers">Followers</a>`
-          }
-        </li>
-        <li class="user__nav-item">
-          ${
-            currentRoute === Route.FOLLOWING
-              ? `<span class="user__nav-route user__nav-route_active">Following</span>`
-              : `<a class="user__nav-route" href="#/${username}/following">Following</a>`
-          }
-        </li>
-      </ul> 
-    </nav>
-    `);
-  render(target);
-};
+const UsernameRoute = ({ match }) => (
+  <>
+    <Username username={match.params.username} />
+    <Navigation username={match.params.username} />
+    <UserProfile username={match.params.username} />
+  </>
+);
 
-const render = target => {
-  // Render static elements
-  renderUserHeader(target);
-  renderUsernameInput(target);
+const UsernameFollowersRoute = ({ match }) => (
+  <>
+    <Username username={match.params.username} />
+    <Navigation username={match.params.username} />
+    <UserFollowers username={match.params.username} />
+  </>
+);
 
-  // Render route-dependent content
-  const routerTarget = document.createElement('div');
-  target.appendChild(routerTarget);
+const UsernameFollowingRoute = ({ match }) => (
+  <>
+    <Username username={match.params.username} />
+    <Navigation username={match.params.username} />
+    <UserFollowing username={match.params.username} />
+  </>
+);
 
-  // ...This router renders specific components based on the URL hash.
-  const router = createHashRouter();
-  router.addRoute('#/:username', (hash, options) => {
-    const username = options.params.username;
+const User = () => (
+  <Router>
+    <div>
+      <UserHeader />
+      <UsernameInput />
+      <Route exact path="/:username" component={UsernameRoute} />
+      <Route
+        exact
+        path="/:username/followers"
+        component={UsernameFollowersRoute}
+      />
+      <Route
+        exact
+        path="/:username/following"
+        component={UsernameFollowingRoute}
+      />
+    </div>
+  </Router>
+);
 
-    routerTarget.innerHTML = '';
-    renderUsername(routerTarget, { username });
-    renderNavigation(routerTarget, { username, currentRoute: Route.USERNAME });
-    renderUserProfile(routerTarget, { username });
-  });
-
-  router.addRoute('#/:username/followers', (hash, options) => {
-    const username = options.params.username;
-
-    routerTarget.innerHTML = '';
-    renderUsername(routerTarget, { username });
-    renderNavigation(routerTarget, { username, currentRoute: Route.FOLLOWERS });
-    renderUserFollowers(routerTarget, { username });
-  });
-
-  router.addRoute('#/:username/following', (hash, options) => {
-    const username = options.params.username;
-
-    routerTarget.innerHTML = '';
-    renderUsername(routerTarget, { username });
-    renderNavigation(routerTarget, { username, currentRoute: Route.FOLLOWING });
-    renderUserFollowing(routerTarget, { username });
-  });
-
-  window.addEventListener('hashchange', router);
-  router();
-};
-
-export default render;
+export default User;

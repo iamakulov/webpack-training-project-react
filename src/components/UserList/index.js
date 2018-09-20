@@ -1,5 +1,5 @@
 /**
- * Copyright 2018 Google Inc. All Rights Reserved.
+ * Copyright 2018 Google Inc, 2018 Ivan Akulov. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,23 +11,17 @@
  * limitations under the License.
  */
 
-import createPlainComponent from '../../utils/createPlainComponent';
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-const render = (target, { users }) => {
-  const renderUserList = createPlainComponent(
-    `<ul>
-      ${users
-        .map(
-          user =>
-            `<li>
-              <a href="#/${user}">${user}</a>
-            </li>`,
-        )
-        .join('')}
-    </ul>`,
-  );
+const UserList = ({ users }) => (
+  <ul>
+    {users.map(user => (
+      <li key={user}>
+        <Link to={`/${user}`}>{user}</Link>
+      </li>
+    ))}
+  </ul>
+);
 
-  renderUserList(target);
-};
-
-export default render;
+export default UserList;
