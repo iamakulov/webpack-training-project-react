@@ -133,32 +133,3 @@ save-github-token.js
 webpack.config.js
                // ↑ The webpack config file
 ```
-
-## How components work
-
-_LitHub_ is built using components, where each component renders a widget on a screen (possibly calling child components).
-
-A component is a plain function that accepts a target (a node where it must be rendered) and a data object to use when rendering the component (e.g. a username). The data argument is optional:
-
-```js
-const component = (/** HTMLElement */ target, /**Object */ data) => {
-  // Render a component
-};
-```
-
-A simple component might look like this:
-
-```js
-// Will render <p>User <username></p> into the target
-const component = (target, { username }) => {
-  const content = document.createElement('div');
-  content.innerHTML = `<p>User ${username}</p>`;
-  target.appendChild(content);
-};
-
-component(document.querySelector('#root'), {
-  username: 'john-smith',
-});
-```
-
-A component could do anything inside itself – from calling other components to setting up event listeners.
