@@ -1,5 +1,7 @@
 # Webpack performance project
 
+> This is a fork of [GoogleChromeLabs/webpack-training-project](https://github.com/GoogleChromeLabs/webpack-training-project) with React instead of homemade components.
+
 A month ago, a popular open-source hosting company decided to build a new extra-light version of its main product – a site with all open-source projects it hosts. They planned that people will use this site on devices with a poor network. They called this product _LitHub_.
 
 As soon as _LitHub_ started, the company realized that all developers are busy on different projects. Somehow, they managed to find a developer who agreed to create this product in their overtime. But two days ago the developer switched the department, and the company decided to hire you to finish the work.
