@@ -25,9 +25,9 @@ import React from 'react';
 import { HashRouter as Router, Route, NavLink } from 'react-router-dom';
 import UserHeader from '../UserHeader';
 import UsernameInput from '../UsernameInput';
-import UserProfile from '../UserProfile';
 import UserFollowers from '../UserFollowers';
 import UserFollowing from '../UserFollowing';
+import Loadable from 'react-loadable';
 import './style.css';
 
 const Username = ({ username }) => (
@@ -69,11 +69,16 @@ const Navigation = ({ username }) => (
   </nav>
 );
 
+const LoadableUserProfile = Loadable({
+  loader: () => import('../UserProfile'),
+  loading: () => 'Loading...',
+});
+
 const UsernameRoute = ({ match }) => (
   <>
     <Username username={match.params.username} />
     <Navigation username={match.params.username} />
-    <UserProfile username={match.params.username} />
+    <LoadableUserProfile username={match.params.username} />
   </>
 );
 

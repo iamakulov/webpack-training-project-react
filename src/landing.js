@@ -22,7 +22,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import Home from './components/Home';
-import User from './components/User';
 import initDevelopmentHelpers from './initDevelopmentHelpers';
 
 // This sets up things that help you during development.
@@ -31,15 +30,4 @@ initDevelopmentHelpers();
 
 const path = window.location.pathname;
 
-switch (path) {
-  case '/':
-    ReactDOM.render(<Home />, document.querySelector('#root'));
-    break;
-
-  case '/users/':
-    ReactDOM.render(<User />, document.querySelector('#root'));
-    break;
-
-  default:
-    throw new Error('Unknown page. Try going to / or /users/');
-}
+ReactDOM.render(<Home />, document.querySelector('#root'));

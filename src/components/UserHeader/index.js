@@ -13,7 +13,10 @@
 
 import React from 'react';
 import logo from './logo.svg';
+import image from './image.jpg';
 import './style.css';
+
+console.log(image);
 
 const UserHeader = () => (
   <header>

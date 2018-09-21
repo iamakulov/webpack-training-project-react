@@ -14,17 +14,26 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const MomentLocalesPlugin = require('moment-locales-webpack-plugin');
+const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
+const { GenerateSW } = require('workbox-webpack-plugin');
 
 const isProduction = process.env.NODE_ENV === 'production';
 
 module.exports = {
-  mode: 'development',
-  entry: './src/index.js',
+  mode: 'production',
+  devtool: false,
+  entry: {
+    landing: './src/landing.js',
+    users: './src/users.js',
+  },
   output: {
     path: path.resolve(__dirname, 'public', 'build'),
-    filename: 'bundle.js',
+    filename: '[name].[chunkhash].js',
     publicPath: '/build/',
   },
+  // inmport()
   module: {
     rules: [
       {
@@ -37,8 +46,25 @@ module.exports = {
         use: ['style-loader', 'css-loader'],
       },
       {
-        test: /\.svg$/,
-        loader: 'file-loader',
+        test: /\.(jpg)$/,
+        loader: 'url-loader',
+        options: {
+          limit: 8192,
+        },
+        enforce: 'post',
+      },
+      {
+        test: /\.(svg)$/,
+        loader: 'svg-url-loader',
+        options: {
+          limit: 8192,
+          noquotes: true,
+        },
+        enforce: 'post',
+      },
+      {
+        test: /\.(svg|png|jpe?g|gif)/,
+        loader: 'image-webpack-loader',
       },
     ],
   },
@@ -48,15 +74,22 @@ module.exports = {
       template: 'src/templates/landing.html',
       filename: path.resolve(__dirname, 'public/index.html'),
       alwaysWriteToDisk: true,
+      excludeChunks: ['runtime~users', 'vendors~users', 'users'],
+      inlineSource: 'runtime~.*\\.js$',
     }),
     new HtmlWebpackPlugin({
       template: 'src/templates/app.html',
       filename: path.resolve(__dirname, 'public/users/index.html'),
       alwaysWriteToDisk: true,
+      excludeChunks: ['runtime~landing', 'vendors~landing', 'landing'],
+      inlineSource: 'runtime~.*\\.js$',
     }),
+    new HtmlWebpackInlineSourcePlugin(),
+    // new BundleAnalyzerPlugin(),
+    new GenerateSW(),
   ].concat(
     isProduction
-      ? []
+      ? [new MomentLocalesPlugin()]
       : [
           // Force writing the HTML files to disk when running in the development mode
           // (otherwise, webpack-dev-server won’t serve the app)
@@ -65,5 +98,11 @@ module.exports = {
   ),
   devServer: {
     contentBase: path.join(__dirname, 'public'),
+  },
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+    },
+    runtimeChunk: true,
   },
 };
